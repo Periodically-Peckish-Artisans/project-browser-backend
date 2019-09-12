@@ -1,0 +1,12 @@
+pr:
+- master
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
+  steps:
+  - script: |
+      cd $(Build.SourcesDirectory)
+      dotnet build -c Debug
+      dotnet build -c Release
+  

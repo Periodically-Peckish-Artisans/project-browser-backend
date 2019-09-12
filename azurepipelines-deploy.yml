@@ -1,0 +1,29 @@
+trigger:
+- master
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
+  steps:
+  - task: AzureResourceGroupDeployment@2
+    displayName: GET OUT THE CREDIT CARD, BABY!
+    inputs:
+      azureSubscription: '$(AzureServiceConnectionName)'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: '$(AzureResourceGroupName)'
+      location: '$(AzureLocation)'
+      templateLocation: 'Linked artifact'
+      csmFile: 'azuredeploy.json'
+      deploymentMode: 'Incremental'
+      overrideParameters: '–appName $(AppName) -googleServiceAccountCreds $(GoogleCreds)'
+  - script: |
+      cd $(Build.SourcesDirectory)
+      dotnet publish -c Release
+      Compress-Archive -Path bin/Release -DestinationPath package.zip -Force
+  - task: AzureFunctionApp@1
+    displayName: Azure Function App Deploy
+    inputs:
+      azureSubscription: $(AzureServiceConnectionName)
+      appName: $(AppName)
+      package: $(Build.SourcesDirectory)/package.zip
+  
