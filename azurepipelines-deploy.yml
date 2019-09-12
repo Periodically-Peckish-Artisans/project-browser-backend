@@ -15,7 +15,7 @@ jobs:
       templateLocation: 'Linked artifact'
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
-      overrideParameters: '–appName "$(AppName)" -googleServiceAccountCreds "$(GoogleCreds)"'
+      overrideParameters: '–appName "$(AppName)" -googleServiceAccountCreds $(GoogleCreds)'
   - script: |
       cd $(Build.SourcesDirectory)
       dotnet publish -c Release
