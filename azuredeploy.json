@@ -33,9 +33,9 @@
   },
   "variables": {
     "functionAppName": "[parameters('appName')]",
-    "hostingPlanName": "[parameters('appName')]",
+    "hostingPlanName": "[concat(parameters('appName'), 'plan')]",
     "googleCreds": "[parameters('googleServiceAccountCreds')]",
-    "applicationInsightsName": "[parameters('appName')]",
+    "applicationInsightsName": "[concat(parameters('appName'), 'insights')]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "functionWorkerRuntime": "dotnet",
