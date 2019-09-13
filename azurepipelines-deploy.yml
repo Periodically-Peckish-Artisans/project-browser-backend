@@ -5,6 +5,12 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
+  - script: |
+      cd $(Build.SourcesDirectory)
+      (Get-Content azuredeploy-parameters.json).replace('[APP_NAME]', '$(AppName)').replace('[LOCATION]', '$(AzureLocation)') | Set-Content azuredeploy-parameters.json
+      dotnet publish -c Release
+      $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
+      Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
@@ -16,15 +22,10 @@ jobs:
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
       csmParametersFile: 'azuredeploy-parameters.json'
-#      overrideParameters: '–appName testappname -storageAccountType Standard_LRS -location [resourceGroup.location] -googleServiceAccountCreds thisisatest'
-#  - script: |
-#      cd $(Build.SourcesDirectory)
-#      dotnet publish -c Release
-#      Compress-Archive -Path bin/Release -DestinationPath package.zip -Force
-#  - task: AzureFunctionApp@1
-#    displayName: Azure Function App Deploy
-#    inputs:
-#      azureSubscription: $(AzureServiceConnectionName)
-#      appName: $(AppName)
-#      package: $(Build.SourcesDirectory)/package.zip
+  - task: AzureFunctionApp@1
+    displayName: Azure Function App Deploy
+    inputs:
+      azureSubscription: $(AzureServiceConnectionName)
+      appName: $(AppName)
+      package: $(Build.SourcesDirectory)/package.zip
   

@@ -3,17 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "appName": {
-            "value": "periodicallypeckishartisanssupertest"
+            "value": "[APP_NAME]"
         },
         "storageAccountType": {
             "value": "Standard_LRS"
         },
-		"location": {
-			"value": "West US"
-		},
-		"googleServiceAccountCreds": {
-			"value": "placeholder"
-		}
+        "location": {
+            "value": "[LOCATION]"
+        },
+        "googleServiceAccountCreds": {
+            "value": "google-creds.json"
+        }
     }
 }
 
