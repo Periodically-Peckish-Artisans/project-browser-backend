@@ -5,14 +5,16 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
-  - script: |
-      cd $(Build.SourcesDirectory)
-      py write-deploy-parameters.py
-      dotnet publish -c Release
-      echo "$env:GOOGLECREDS"
-      "$env:GOOGLECREDS" | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
-      echo "Here!"
-      Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
+  - task:
+      targetType: inline
+      script: |
+        cd $(Build.SourcesDirectory)
+        py write-deploy-parameters.py
+        dotnet publish -c Release
+        echo $env:GOOGLECREDS
+        $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
+        echo "Here!"
+        Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
