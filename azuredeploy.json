@@ -38,7 +38,8 @@
     "applicationInsightsName": "[parameters('appName')]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-    "functionWorkerRuntime": "dotnet"
+    "functionWorkerRuntime": "dotnet",
+    "insightsLocation": "[parameters('location')]"
   },
   "resources": [
     {
@@ -123,7 +124,7 @@
       "apiVersion": "2018-05-01-preview",
       "name": "[variables('applicationInsightsName')]",
       "type": "microsoft.insights/components",
-      "location": "East US",
+      "location": "[variables('insightsLocation')]",
       "tags": {
         "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('applicationInsightsName'))]": "Resource"
       },
