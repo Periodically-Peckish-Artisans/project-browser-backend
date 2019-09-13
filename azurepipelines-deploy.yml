@@ -11,11 +11,12 @@ jobs:
       azureSubscription: '$(AzureServiceConnectionName)'
       action: 'Create Or Update Resource Group'
       resourceGroupName: '$(AzureResourceGroupName)'
-      location: 'westus'
+      location: 'West US'
       templateLocation: 'Linked artifact'
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
-      overrideParameters: '–appName testappname -storageAccountType Standard_LRS -location [resourceGroup.location] -googleServiceAccountCreds thisisatest'
+      csmParametersFile: 'azuredeploy-parameters.json'
+#      overrideParameters: '–appName testappname -storageAccountType Standard_LRS -location [resourceGroup.location] -googleServiceAccountCreds thisisatest'
 #  - script: |
 #      cd $(Build.SourcesDirectory)
 #      dotnet publish -c Release
