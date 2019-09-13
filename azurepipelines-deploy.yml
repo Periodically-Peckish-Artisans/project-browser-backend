@@ -7,7 +7,7 @@ jobs:
   steps:
   - script: |
       cd $(Build.SourcesDirectory)
-      (Get-Content azuredeploy-parameters.json).replace('[APP_NAME]', '$(AppName)').replace('[LOCATION]', '$(AzureLocation)') | Set-Content azuredeploy-parameters.json
+      ((Get-Content azuredeploy-parameters.json) -replace '\[APP_NAME\]', '$(AppName)') -replace '\[LOCATION\]', '$(AzureLocation)' | Set-Content azuredeploy-parameters.json
       dotnet publish -c Release
       $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
       Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
