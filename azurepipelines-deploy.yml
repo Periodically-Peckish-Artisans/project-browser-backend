@@ -14,13 +14,17 @@ jobs:
         py write-deploy-parameters.py
         dotnet publish -c Release
         $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
-        Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
   - task: ArchiveFiles@2
     displayName: Zip package
     inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish' 
-      includeRootFolder: true
+      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/' 
+      includeRootFolder: false
       archiveFile: '$(Build.SourcesDirectory)/package.zip'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(Build.SourcesDirectory)/package.zip' 
+      artifactName: 'drop' 
+  - task: Artifact
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
