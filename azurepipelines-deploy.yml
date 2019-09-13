@@ -5,7 +5,7 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
-  - task:
+  - task: Powershell@2
       targetType: inline
       script: |
         cd $(Build.SourcesDirectory)
