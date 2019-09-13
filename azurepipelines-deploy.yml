@@ -15,15 +15,15 @@ jobs:
       templateLocation: 'Linked artifact'
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
-      overrideParameters: '–appName "$(AppName)" -storageAccountType "Standard_LRS" -location "West Us" -googleServiceAccountCreds "$(GoogleCreds)"'
-  - script: |
-      cd $(Build.SourcesDirectory)
-      dotnet publish -c Release
-      Compress-Archive -Path bin/Release -DestinationPath package.zip -Force
-  - task: AzureFunctionApp@1
-    displayName: Azure Function App Deploy
-    inputs:
-      azureSubscription: $(AzureServiceConnectionName)
-      appName: $(AppName)
-      package: $(Build.SourcesDirectory)/package.zip
+      overrideParameters: '–appName testappname -googleServiceAccountCreds thisisatest'
+#  - script: |
+#      cd $(Build.SourcesDirectory)
+#      dotnet publish -c Release
+#      Compress-Archive -Path bin/Release -DestinationPath package.zip -Force
+#  - task: AzureFunctionApp@1
+#    displayName: Azure Function App Deploy
+#    inputs:
+#      azureSubscription: $(AzureServiceConnectionName)
+#      appName: $(AppName)
+#      package: $(Build.SourcesDirectory)/package.zip
   
