@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Web.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
+using Google.Apis.Auth.OAuth2;
 
 namespace ProjectBrowser.Backend
 {
@@ -46,13 +47,14 @@ namespace ProjectBrowser.Backend
             return new JsonResult(projectObj);
         }
 
-        private static async Task<string> GetUidAsync(HttpRequest req) {
+        private static async Task<string> GetUidAsync(HttpRequest req, ExecutionContext context, ILogger log) {
             string token = req.Headers["Authorization"];
             if (string.IsNullOrEmpty(token)) {
                 return null;
             }
             if (FirebaseApp.DefaultInstance == null) {
-                var app = FirebaseApp.Create();
+                string credentialsFilePath = Path.GetFullPath(Path.Combine(context.FunctionDirectory, "..\\google-creds.json"));
+                var app = FirebaseApp.Create(new AppOptions { Credential = GoogleCredential.FromFile(credentialsFilePath)});
             }
 
             FirebaseToken t;
@@ -60,7 +62,8 @@ namespace ProjectBrowser.Backend
             try {
                 t = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
             }
-            catch {
+            catch (Exception ex) {
+                log.LogWarning(ex, "Firebase failed to verify token.");
                 return null;
             }
 
@@ -82,7 +85,8 @@ namespace ProjectBrowser.Backend
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "project/{projectId}")] HttpRequest req,
             ILogger log,
             [Blob("project/{projectId}", FileAccess.ReadWrite)] CloudBlockBlob project,
-            string projectId)
+            string projectId,
+            ExecutionContext context)
         {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
@@ -115,7 +119,7 @@ namespace ProjectBrowser.Backend
                 string uid = string.Empty;
 
                 if (GetUseAuth()) {
-                    uid = await GetUidAsync(req);
+                    uid = await GetUidAsync(req, context, log);
 
                     if (uid == null) {
                         return new UnauthorizedResult();
@@ -147,7 +151,7 @@ namespace ProjectBrowser.Backend
                 }
 
                 if (GetUseAuth()) {
-                    string uid = await GetUidAsync(req);
+                    string uid = await GetUidAsync(req, context, log);
                     if (uid == null) {
                         return new UnauthorizedResult();
                     }

@@ -22,19 +22,11 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
-    "googleServiceAccountCreds": {
-      "type": "string",
-      "defaultValue": "YOU NEED THIS",
-      "metadata": {
-        "description": "This is the GOOGLE_APPLICATION_CREDENTIALS environment variable for Firebase authentication. (See: https://firebase.google.com/docs/admin/setup/ )"
-      }
     }
   },
   "variables": {
     "functionAppName": "[parameters('appName')]",
     "hostingPlanName": "[concat(parameters('appName'), 'plan')]",
-    "googleCreds": "[parameters('googleServiceAccountCreds')]",
     "applicationInsightsName": "[concat(parameters('appName'), 'insights')]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
@@ -111,10 +103,6 @@
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "[variables('functionWorkerRuntime')]"
-            },
-            {
-              "name": "GOOGLE_APPLICATION_CREDENTIALS",
-              "value": "[variables('googleCreds')]"
             },
             {
               "name": "UseFirebaseAuth",

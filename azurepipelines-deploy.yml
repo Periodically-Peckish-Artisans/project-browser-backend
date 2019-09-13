@@ -12,8 +12,8 @@ jobs:
       script: |
         cd $(Build.SourcesDirectory)
         py write-deploy-parameters.py
+        $env:GOOGLECREDS | Out-File google-creds.json
         dotnet publish -c Release
-        $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
   - task: ArchiveFiles@2
     displayName: Zip package
     inputs:

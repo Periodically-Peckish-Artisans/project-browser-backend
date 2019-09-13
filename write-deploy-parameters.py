@@ -13,9 +13,6 @@ params = {
   },
   "location": {
     "value": os.environ["AZURELOCATION"]
-  },
-  "googleServiceAccountCreds": {
-    "value": "google-creds.json" # We'll dump this file into the package in the build script
   }
 }
 
