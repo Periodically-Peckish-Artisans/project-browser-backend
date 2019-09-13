@@ -19,7 +19,7 @@ jobs:
     displayName: Zip package
     inputs:
       rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish' 
-      includeRootFolder: false 
+      includeRootFolder: true
       archiveFile: '$(Build.SourcesDirectory)/package.zip'
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
