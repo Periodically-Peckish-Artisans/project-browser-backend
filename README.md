@@ -3,7 +3,7 @@
 
 [![Build Status](https://dev.azure.com/pworthey007/Periodically%20Peckish%20Artisans/_apis/build/status/Periodically-Peckish-Artisans.project-browser-backend?branchName=master)](https://dev.azure.com/pworthey007/Periodically%20Peckish%20Artisans/_build/latest?definitionId=2&branchName=master)
 
-## Instructions to set up CI/CD on your own if you fork and want to get :
+## Instructions to set up CI/CD on your own if you fork:
 
 My advice would be: you should probably know what you're doing if you're doing this. Technologies involved: Azure DevOps build pipelines, Azure, ARM Templates, and Google Firebase authentication. The currently configured setup is to deploy when changes are integrated into master.
 

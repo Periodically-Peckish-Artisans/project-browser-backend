@@ -6,17 +6,21 @@ jobs:
     vmImage: 'windows-2019'
   steps:
   - task: Powershell@2
-    displayName: Build and Package
+    displayName: Build
     inputs:
       targetType: inline
       script: |
         cd $(Build.SourcesDirectory)
         py write-deploy-parameters.py
         dotnet publish -c Release
-        echo $env:GOOGLECREDS
         $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
-        echo "Here!"
         Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
+  - task: ArchiveFiles@2
+    displayName: Zip package
+    inputs:
+      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish' 
+      includeRootFolder: false 
+      archiveFile: '$(Build.SourcesDirectory)/package.zip'
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
