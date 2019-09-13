@@ -115,6 +115,10 @@
             {
               "name": "GOOGLE_APPLICATION_CREDENTIALS",
               "value": "[variables('googleCreds')]"
+            },
+            {
+              "name": "UseFirebaseAuth",
+              "value": "true"
             }
           ]
         }
