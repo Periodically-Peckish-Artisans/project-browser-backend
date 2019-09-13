@@ -15,7 +15,7 @@ jobs:
       templateLocation: 'Linked artifact'
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
-      overrideParameters: '–appName testappname -storageAccountType Standard_LRS location [resourceGroup.location] -googleServiceAccountCreds thisisatest'
+      overrideParameters: '–appName testappname -storageAccountType Standard_LRS -location [resourceGroup.location] -googleServiceAccountCreds thisisatest'
 #  - script: |
 #      cd $(Build.SourcesDirectory)
 #      dotnet publish -c Release
