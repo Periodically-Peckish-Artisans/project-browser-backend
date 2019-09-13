@@ -17,7 +17,7 @@ jobs:
         $env:GOOGLECREDS | Out-File bin/Release/netcoreapp2.1/publish/google-creds.json
         echo "Here!"
         Compress-Archive -Path bin/Release/netcoreapp2.1/publish -DestinationPath package.zip -Force
-    - task: AzureResourceGroupDeployment@2
+  - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
