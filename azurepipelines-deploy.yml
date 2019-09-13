@@ -41,4 +41,5 @@ jobs:
       azureSubscription: $(AzureServiceConnectionName)
       appName: $(AppName)
       package: $(Build.SourcesDirectory)/package.zip
+      deploymentMethod: zipDeploy
   
