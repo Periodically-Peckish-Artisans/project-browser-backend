@@ -24,7 +24,6 @@ jobs:
     inputs:
       pathtoPublish: '$(Build.SourcesDirectory)/package.zip' 
       artifactName: 'drop' 
-  - task: Artifact
   - task: AzureResourceGroupDeployment@2
     displayName: GET OUT THE CREDIT CARD, BABY!
     inputs:
