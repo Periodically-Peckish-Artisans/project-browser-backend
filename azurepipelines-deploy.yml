@@ -12,9 +12,9 @@ jobs:
       script: |
         cd $(Build.SourcesDirectory)
         py write-deploy-parameters.py
-        "Build ID: $(Build.BuildId)" | Out-File source.txt
         $env:GOOGLECREDS | Out-File google-creds.json
         dotnet publish -c Release
+        "Build ID: $(Build.BuildId)" | Out-File "$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/source.txt"
   - task: ArchiveFiles@2
     displayName: Zip package
     inputs:
