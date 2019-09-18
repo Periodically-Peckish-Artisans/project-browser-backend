@@ -41,7 +41,7 @@ jobs:
     displayName: Azure Function App Deploy
     inputs:
       azureSubscription: $(AzureServiceConnectionName)
-      resourceGroupName: $(AzureResourceGroupName)
       appName: $(AppName)
       package: $(Build.SourcesDirectory)/package.zip
+      deploymentMethod: zipDeploy
   
