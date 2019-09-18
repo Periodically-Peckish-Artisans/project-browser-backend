@@ -11,6 +11,7 @@ jobs:
       targetType: inline
       script: |
         cd $(Build.SourcesDirectory)
+        $env:ADOBUILDID = "$(Build.BuildId)"
         py write-deploy-parameters.py
         $env:GOOGLECREDS | Out-File google-creds.json
         dotnet publish -c Release

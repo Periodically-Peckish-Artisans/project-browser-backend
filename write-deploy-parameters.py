@@ -15,7 +15,7 @@ params = {
     "value": os.environ["AZURELOCATION"]
   },
   "buildid": {
-    "value": os.environ["BUILD.BUILDID"]
+    "value": os.environ["ADOBUILDID"]
   }
 }
 
