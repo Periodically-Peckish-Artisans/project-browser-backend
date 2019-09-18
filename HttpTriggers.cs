@@ -22,6 +22,12 @@ namespace ProjectBrowser.Backend
             return bool.TryParse(Environment.GetEnvironmentVariable("UseFirebaseAuth"), out bool output) && output;
         }
 
+        [FunctionName("build-version-get")]
+        public static IActionResult BuildVersionGet([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "build")] HttpRequest req)
+        {
+            return new JsonResult(new { BuildId = Environment.GetEnvironmentVariable("BuildId") });
+        }
+
         [FunctionName("project-get")]
         public static async Task<IActionResult> ProjectGetAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "project/{projectId}")] HttpRequest req,
@@ -54,6 +60,7 @@ namespace ProjectBrowser.Backend
             }
             if (FirebaseApp.DefaultInstance == null) {
                 string credentialsFilePath = Path.GetFullPath(Path.Combine(context.FunctionDirectory, "..\\google-creds.json"));
+                log.LogWarning($"Loading Google credentials from path: {credentialsFilePath}");
                 var app = FirebaseApp.Create(new AppOptions { Credential = GoogleCredential.FromFile(credentialsFilePath)});
             }
 

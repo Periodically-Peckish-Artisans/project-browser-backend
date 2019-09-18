@@ -13,6 +13,9 @@ params = {
   },
   "location": {
     "value": os.environ["AZURELOCATION"]
+  },
+  "buildid": {
+    "value": os.environ["BUILD.BUILDID"]
   }
 }
 

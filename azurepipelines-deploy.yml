@@ -12,6 +12,7 @@ jobs:
       script: |
         cd $(Build.SourcesDirectory)
         py write-deploy-parameters.py
+        "Build ID: $(Build.BuildId)" | Out-File source.txt
         $env:GOOGLECREDS | Out-File google-creds.json
         dotnet publish -c Release
   - task: ArchiveFiles@2
