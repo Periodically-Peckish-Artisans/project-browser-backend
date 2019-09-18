@@ -44,6 +44,6 @@ jobs:
       appName: $(AppName)
       package: '$(Build.SourcesDirectory)/package.zip'
       resourceGroupName: '$(AzureResourceGroupName)'
-      deploymentMethod: zipDeploy
+      deploymentMethod: runFromPackage
 
   
