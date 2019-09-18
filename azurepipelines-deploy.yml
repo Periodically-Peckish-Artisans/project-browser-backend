@@ -42,5 +42,8 @@ jobs:
     inputs:
       azureSubscription: $(AzureServiceConnectionName)
       appName: $(AppName)
-      package: $(Build.SourcesDirectory)/package.zip
+      package: '$(Build.SourcesDirectory)/package.zip'
+      resourceGroupName: '$(AzureResourceGroupName)'
+      deploymentMethod: zipDeploy
+
   
