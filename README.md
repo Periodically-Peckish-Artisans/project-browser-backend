@@ -16,4 +16,4 @@ My advice would be: you should probably know what you're doing if you're doing t
 * $(AzureLocation) = Where the server farm will be located ie. 'West US'
 * $(AzureResourceGroupName) = Any name for the resource group to be created/updated
 * $(AzureServiceConnectoinName) = The name of the service connection name you made in Azure DevOps
-* $(GoogleCreds) SHOULD BE MARKED AS SECRET = A copy/paste of your Google Firebase SA credentials json
+6. Head to the Pipelines Library tab, and add a new Secure File named 'google-creds.json' containing your google SA credentials

@@ -5,6 +5,11 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
+  - task: DownloadSecureFile@1
+    name: googleCreds
+    displayName: 'Download Google Credentials'
+    inputs:
+      secureFile: 'google-creds.json'
   - task: Powershell@2
     displayName: Build
     inputs:
@@ -13,7 +18,7 @@ jobs:
         cd $(Build.SourcesDirectory)
         $env:ADOBUILDID = "$(Build.BuildId)"
         py write-deploy-parameters.py
-        $env:GOOGLECREDS | Out-File google-creds.json
+        Copy-Item '$(googleCreds.secureFilePath)' -Destination 'google-creds.json' -Force
         dotnet publish -c Release
         "Build ID: $(Build.BuildId)" | Out-File "$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/source.txt"
   - task: ArchiveFiles@2
