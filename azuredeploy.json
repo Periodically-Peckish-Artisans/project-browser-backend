@@ -35,8 +35,10 @@
     "functionAppName": "[parameters('appName')]",
     "hostingPlanName": "[concat(parameters('appName'), 'plan')]",
     "applicationInsightsName": "[concat(parameters('appName'), 'insights')]",
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
+    "storageAccountName": "[parameters('appName')]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+    "searchServiceName": "[parameters('appName')]",
+    "searchServiceLocation": "[parameters('location')]",
     "functionWorkerRuntime": "dotnet",
     "insightsLocation": "[parameters('location')]",
     "build": "[parameters('buildid')]"
@@ -135,6 +137,21 @@
       "properties": {
         "ApplicationId": "[variables('applicationInsightsName')]",
         "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    },
+    {
+      "type": "Microsoft.Search/searchServices",
+      "apiVersion": "2015-08-19",
+      "name": "[variables('searchServiceName')]",
+      "location": "[variables('searchServiceLocation')]",
+      "tags": {},
+      "sku": {
+          "name": "free"
+      },
+      "properties": {
+          "replicaCount": 1,
+          "partitionCount": 1,
+          "hostingMode": "Default"
       }
     }
   ]

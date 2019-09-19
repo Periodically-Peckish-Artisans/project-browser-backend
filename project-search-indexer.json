@@ -1,0 +1,35 @@
+{
+  "name": "projectindexer",
+  "description": "",
+  "dataSourceName": "projectdatasource",
+  "skillsetName": null,
+  "targetIndexName": "project-search-index",
+  "disabled": null,
+  "schedule": {
+    "interval": "PT1H",
+    "startTime": "0001-01-01T00:00:00Z"
+  },
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
+    "base64EncodeKeys": false,
+    "configuration": {
+      "dataToExtract": "contentAndMetadata",
+      "parsingMode": "json",
+      "firstLineContainsHeaders": false,
+      "delimitedTextDelimiter": ","
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "metadata_storage_path",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": null
+      }
+    }
+  ],
+  "outputFieldMappings": []
+}
