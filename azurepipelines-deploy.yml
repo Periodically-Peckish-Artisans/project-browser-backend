@@ -57,6 +57,6 @@ jobs:
       inline: |
         cd '$(Build.SourcesDirectory)'
         $env:searchkeys = az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)'
-        $env:storageconnstr = az storage account show-connection-string --resource-group '$(AzureResourceGroupName)'--name '$(AppName)'
+        $env:storageconnstr = az storage account show-connection-string --resource-group '$(AzureResourceGroupName)'--name 'projectbrowsersa'
         py reset-search-index.py
   

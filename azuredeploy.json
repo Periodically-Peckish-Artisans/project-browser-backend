@@ -35,7 +35,7 @@
     "functionAppName": "[parameters('appName')]",
     "hostingPlanName": "[concat(parameters('appName'), 'plan')]",
     "applicationInsightsName": "[concat(parameters('appName'), 'insights')]",
-    "storageAccountName": "[parameters('appName')]",
+    "storageAccountName": "projectbrowsersa",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "searchServiceName": "[parameters('appName')]",
     "searchServiceLocation": "[parameters('location')]",
