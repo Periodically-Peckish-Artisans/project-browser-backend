@@ -54,6 +54,7 @@ jobs:
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
       scriptType: inlineScript
+      azurePowerShellVersion: 'Latest installed version'
       inline: |
         cd '$(Build.SourcesDirectory)'
         $env:searchkeys = az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)'
