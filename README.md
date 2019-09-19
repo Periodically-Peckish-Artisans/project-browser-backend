@@ -17,3 +17,4 @@ My advice would be: you should probably know what you're doing if you're doing t
 * $(AzureResourceGroupName) = Any name for the resource group to be created/updated
 * $(AzureServiceConnectoinName) = The name of the service connection name you made in Azure DevOps
 6. Head to the Pipelines Library tab, and add a new Secure File named 'google-creds.json' containing your google SA credentials
+7. Upon first build, you will need to authorize resource use of the Secure File (build will fail, but will grant you option to authorize)
