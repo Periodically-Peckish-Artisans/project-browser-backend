@@ -5,52 +5,52 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
-#  - task: DownloadSecureFile@1
-#    name: googleCreds
-#    displayName: 'Download Google Credentials'
-#    inputs:
-#      secureFile: 'google-creds.json'
-#  - task: Powershell@2
-#    displayName: Build
-#    inputs:
-#      targetType: inline
-#      script: |
-#        cd $(Build.SourcesDirectory)
-#        $env:ADOBUILDID = "$(Build.BuildId)"
-#        py write-deploy-parameters.py
-#        Copy-Item '$(googleCreds.secureFilePath)' -Destination 'google-creds.json' -Force
-#        dotnet publish -c Release
-#        "Build ID: $(Build.BuildId)" | Out-File "$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/source.txt"
-#  - task: ArchiveFiles@2
-#    displayName: Zip package
-#    inputs:
-#      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/' 
-#      includeRootFolder: false
-#      archiveFile: '$(Build.SourcesDirectory)/package.zip'
-#  - task: PublishBuildArtifacts@1
-#    inputs:
-#      pathtoPublish: '$(Build.SourcesDirectory)/package.zip' 
-#      artifactName: 'drop' 
-#  - task: AzureResourceGroupDeployment@2
-#    displayName: GET OUT THE CREDIT CARD, BABY!
-#    inputs:
-#      azureSubscription: '$(AzureServiceConnectionName)'
-#      action: 'Create Or Update Resource Group'
-#      resourceGroupName: '$(AzureResourceGroupName)'
-#      location: 'West US'
-#      templateLocation: 'Linked artifact'
-#      csmFile: 'azuredeploy.json'
-#      deploymentMode: 'Incremental'
-#      csmParametersFile: 'azuredeploy-parameters.json'
-#  - task: AzureFunctionApp@1
-#    displayName: Azure Function App Deploy
-#    inputs:
-#      azureSubscription: $(AzureServiceConnectionName)
-#      appName: $(AppName)
-#      package: '$(Build.SourcesDirectory)/package.zip'
-#      resourceGroupName: '$(AzureResourceGroupName)'
+  - task: DownloadSecureFile@1
+    name: googleCreds
+    displayName: 'Download Google Credentials'
+    inputs:
+      secureFile: 'google-creds.json'
+  - task: Powershell@2
+    displayName: Build
+    inputs:
+      targetType: inline
+      script: |
+        cd $(Build.SourcesDirectory)
+        $env:ADOBUILDID = "$(Build.BuildId)"
+        py write-deploy-parameters.py
+        Copy-Item '$(googleCreds.secureFilePath)' -Destination 'google-creds.json' -Force
+        dotnet publish -c Release
+        "Build ID: $(Build.BuildId)" | Out-File "$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/source.txt"
+  - task: ArchiveFiles@2
+    displayName: Zip package
+    inputs:
+      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/Release/netcoreapp2.1/publish/' 
+      includeRootFolder: false
+      archiveFile: '$(Build.SourcesDirectory)/package.zip'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(Build.SourcesDirectory)/package.zip' 
+      artifactName: 'drop' 
+  - task: AzureResourceGroupDeployment@2
+    displayName: GET OUT THE CREDIT CARD, BABY!
+    inputs:
+      azureSubscription: '$(AzureServiceConnectionName)'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: '$(AzureResourceGroupName)'
+      location: 'West US'
+      templateLocation: 'Linked artifact'
+      csmFile: 'azuredeploy.json'
+      deploymentMode: 'Incremental'
+      csmParametersFile: 'azuredeploy-parameters.json'
+  - task: AzureFunctionApp@1
+    displayName: Azure Function App Deploy
+    inputs:
+      azureSubscription: $(AzureServiceConnectionName)
+      appName: $(AppName)
+      package: '$(Build.SourcesDirectory)/package.zip'
+      resourceGroupName: '$(AzureResourceGroupName)'
   - task: AzureCLI@1
-    displayName: Reset search index
+    displayName: Fetch Deployed Admin Keys
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
       scriptLocation: inlineScript
@@ -58,5 +58,9 @@ jobs:
         cd '$(Build.SourcesDirectory)'
         az search admin-key show --resource-group $(AzureResourceGroupName) --service-name $(AppName) > searchkeys.json
         az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
+  - task: Powershell@2
+    displayName: Reset Search Indexes
+    inputs:
+      targetType: inline
+      script: |
         py reset-search-index.py
-  
