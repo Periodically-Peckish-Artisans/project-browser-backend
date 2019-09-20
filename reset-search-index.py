@@ -5,14 +5,17 @@ import json
 import http.client
 import os
 
+searchkey = ''
+with open('searchkeys.json') as fp:
+  searchkey = json.load(fp)['primaryKey']
+
 def executeSearchFunc(method, relativeUrl, body):
-  key = json.loads(os.environ['SEARCHKEYS'])['primaryKey']
   baseurl = '%s.search.windows.net' % (os.environ['APPNAME'])
 
   req = http.client.HTTPSConnection(baseurl)
   req.request(method, relativeUrl + '?api-version=2019-05-06', body = json.dumps(body), 
     headers = {
-      'api-key': key,
+      'api-key': searchkey,
       'Content-Type': 'application/json'
   })
   response = req.getresponse()
@@ -23,7 +26,9 @@ def executeSearchFunc(method, relativeUrl, body):
   print()
   req.close()
 
-storageconnstr = json.loads(os.environ['STORAGECONNSTR'])['connectionString']
+storageconnstr = ''
+with open('storagekeys.json') as fp:
+  storageconnstr = json.load(fp)['connectionString']
 
 executeSearchFunc('DELETE', '/datasources/projectdatasource', {})
 executeSearchFunc('POST', '/datasources', {
