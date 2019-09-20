@@ -58,11 +58,11 @@ jobs:
       workingDirectory: 
   - task: AzureCLI@1
     displayName: Fetch Deployed Admin Keys (2)
-      inputs:
-        azureSubscription: '$(AzureServiceConnectionName)'
-        scriptLocation: inlineScript
-        inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
-        workingDirectory: $(Build.SourcesDirectory)
+    inputs:
+      azureSubscription: '$(AzureServiceConnectionName)'
+      scriptLocation: inlineScript
+      inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
+      workingDirectory: $(Build.SourcesDirectory)
   - task: Powershell@2
     displayName: Reset Search Indexes
     inputs:
