@@ -57,6 +57,7 @@ jobs:
       azurePowerShellVersion: 'latestVersion'
       inline: |
         cd '$(Build.SourcesDirectory)'
+        az login
         $env:searchkeys = az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)'
         $env:storageconnstr = az storage account show-connection-string --resource-group '$(AzureResourceGroupName)'--name 'projectbrowsersa'
         py reset-search-index.py
