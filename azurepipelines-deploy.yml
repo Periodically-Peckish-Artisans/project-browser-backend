@@ -49,17 +49,14 @@ jobs:
 #      appName: $(AppName)
 #      package: '$(Build.SourcesDirectory)/package.zip'
 #      resourceGroupName: '$(AzureResourceGroupName)'
-  - task: AzurePowerShell@4
+  - task: AzureCLI@1
     displayName: Reset search index
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
-      scriptType: inlineScript
-      azurePowerShellVersion: 'latestVersion'
-      inline: |
+      scriptLocation: inlineScript
+      inlineScript: |
         cd '$(Build.SourcesDirectory)'
-        Connect-AzAccount
-        az login
-        $env:searchkeys = az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)'
-        $env:storageconnstr = az storage account show-connection-string --resource-group '$(AzureResourceGroupName)'--name 'projectbrowsersa'
+        export SEARCHKEYS = $(az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)')
+        export STORAGECONNSTR = $(az storage account show-connection-string --resource-group '$(AzureResourceGroupName)' --name 'projectbrowsersa')
         py reset-search-index.py
   
