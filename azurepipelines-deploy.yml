@@ -56,7 +56,7 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         cd '$(Build.SourcesDirectory)'
-        az search admin-key show --resource-group '$(AzureResourceGroupName)' --service-name '$(AppName)' > searchkeys.json
-        az storage account show-connection-string --resource-group '$(AzureResourceGroupName)' --name 'projectbrowsersa' > storagekeys.json
+        az search admin-key show --resource-group $(AzureResourceGroupName) --service-name $(AppName) > searchkeys.json
+        az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
         py reset-search-index.py
   
