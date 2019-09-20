@@ -50,19 +50,23 @@ jobs:
 #      package: '$(Build.SourcesDirectory)/package.zip'
 #      resourceGroupName: '$(AzureResourceGroupName)'
   - task: AzureCLI@1
-    displayName: Fetch Deployed Admin Keys
+    displayName: Fetch Deployed Admin Keys (1)
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
       scriptLocation: inlineScript
-      inlineScript: |
-        cd "$(Build.SourcesDirectory)"
-        az search admin-key show --resource-group $(AzureResourceGroupName) --service-name $(AppName) > searchkeys.json
-        az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
+      inlineScript: az search admin-key show --resource-group $(AzureResourceGroupName) --service-name $(AppName) > searchkeys.json
+      workingDirectory: 
+  - task: AzureCLI@1
+    displayName: Fetch Deployed Admin Keys (2)
+      inputs:
+        azureSubscription: '$(AzureServiceConnectionName)'
+        scriptLocation: inlineScript
+        inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
+        workingDirectory: $(Build.SourcesDirectory)
   - task: Powershell@2
     displayName: Reset Search Indexes
     inputs:
       targetType: inline
       script: |
         cd '$(Build.SourcesDirectory)'
-        ls
         py reset-search-index.py
