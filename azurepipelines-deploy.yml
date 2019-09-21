@@ -73,6 +73,7 @@ jobs:
         $acc = Get-AzStorageAccount -ResourceGroupName "$(AzureResourceGroupName)" -Name "projectbrowsersa"
         New-AzStorageContainer -Name "project" -Context $acc.Context
       failOnStandardError: false
+      azurePowerShellVersion: latestVersion
   - task: Powershell@2
     displayName: Reset Search Indexes
     inputs:
