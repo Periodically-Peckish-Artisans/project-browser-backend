@@ -15,6 +15,7 @@ My advice would be: you should probably know what you're doing if you're doing t
 * $(AppName) = Name of the function app (should be globally unique since it forms basis of URL)
 * $(AzureLocation) = Where the server farm will be located ie. 'West US'
 * $(AzureResourceGroupName) = Any name for the resource group to be created/updated
-* $(AzureServiceConnectoinName) = The name of the service connection name you made in Azure DevOps
+* $(AzureServiceConnectionName) = The name of the service connection name you made in Azure DevOps
+* $(AzureStorageAccountName) = The name of the storage account (no non-alphanumeric characters, and less than 24 characters)
 6. Head to the Pipelines Library tab, and add a new Secure File named 'google-creds.json' containing your google SA credentials
 7. Upon first build, you will need to authorize resource use of the Secure File (build will fail, but will grant you option to authorize)

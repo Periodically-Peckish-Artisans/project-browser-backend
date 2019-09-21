@@ -8,6 +8,9 @@ params = {
   "appName": {
     "value": os.environ['APPNAME']
   },
+  "storageAccountName": {
+    "value": os.environ["AZURESTORAGEACCOUNTNAME"]
+  },
   "storageAccountType": {
     "value": "Standard_LRS"
   },

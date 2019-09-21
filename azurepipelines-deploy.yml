@@ -61,7 +61,7 @@ jobs:
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
       scriptLocation: inlineScript
-      inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
+      inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name $(AzureStorageAccountName) > storagekeys.json
       workingDirectory: $(Build.SourcesDirectory)
   - task: AzurePowerShell@4
     displayName: Create Storage Container
@@ -70,7 +70,7 @@ jobs:
       scriptType: inlineScript
       inline: |
         cd $(Build.SourcesDirectory)
-        $acc = Get-AzStorageAccount -ResourceGroupName "$(AzureResourceGroupName)" -Name "projectbrowsersa"
+        $acc = Get-AzStorageAccount -ResourceGroupName "$(AzureResourceGroupName)" -Name "$(AzureStorageAccountName)"
         New-AzStorageContainer -Name "project" -Context $acc.Context
       failOnStandardError: false
       azurePowerShellVersion: latestVersion
