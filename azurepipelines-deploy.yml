@@ -63,13 +63,16 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name projectbrowsersa > storagekeys.json
       workingDirectory: $(Build.SourcesDirectory)
-  - task: AzureCLI@1
-    displayName: Create Project Container
+  - task: AzurePowerShell@4
+    displayName: Create Storage Container
     inputs:
       azureSubscription: '$(AzureServiceConnectionName)'
-      scriptLocation: inlineScript
-      inlineScript: az storage container create --name project --resource-group $(AzureResourceGroupName) --account-name projectbrowsersa
-      workingDirectory: $(Build.SourcesDirectory)
+      scriptType: inlineScript
+      inline: |
+        cd $(Build.SourcesDirectory)
+        $acc = Get-AzStorageAccount -ResourceGroupName "$(AzureResourceGroupName)" -Name "projectbrowsersa"
+        New-AzStorageContainer -Name "project" -Context $acc.Context
+      failOnStandardError: false
   - task: Powershell@2
     displayName: Reset Search Indexes
     inputs:
