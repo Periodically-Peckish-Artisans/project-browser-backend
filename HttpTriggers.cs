@@ -87,9 +87,9 @@ namespace ProjectBrowser.Backend
             return uid;
         }
 
-        [FunctionName("project-post")]
-        public static async Task<IActionResult> ProjectPostAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "project/{projectId}")] HttpRequest req,
+        [FunctionName("project-put")]
+        public static async Task<IActionResult> ProjectPutAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "project/{projectId}")] HttpRequest req,
             ILogger log,
             [Blob("project/{projectId}", FileAccess.ReadWrite)] CloudBlockBlob project,
             string projectId,
@@ -119,7 +119,7 @@ namespace ProjectBrowser.Backend
                     projectObj = JsonConvert.DeserializeObject<Models.Project>(json);
                 }
                 catch (JsonException ex) {
-                    log.LogError(ex, $"project-post failed to deserialize json for blob: {project.Name}.");
+                    log.LogError(ex, $"project-put failed to deserialize json for blob: {project.Name}.");
                     return new InternalServerErrorResult();
                 }
 

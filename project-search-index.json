@@ -31,20 +31,6 @@
       "synonymMaps": []
     },
     {
-      "name": "Purpose",
-      "type": "Edm.String",
-      "searchable": true,
-      "filterable": false,
-      "retrievable": true,
-      "sortable": false,
-      "facetable": false,
-      "key": false,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "analyzer": "standard.lucene",
-      "synonymMaps": []
-    },
-    {
       "name": "Description",
       "type": "Edm.String",
       "searchable": true,
@@ -59,10 +45,24 @@
       "synonymMaps": []
     },
     {
-      "name": "DiscordInvite",
+      "name": "ProjectWebsite",
+      "type": "Edm.String",
+      "searchable": true,
+      "filterable": false,
+      "retrievable": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "analyzer": null,
+      "synonymMaps": []
+    },
+    {
+      "name": "ProjectLocation",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
       "retrievable": true,
       "sortable": false,
       "facetable": false,
@@ -98,20 +98,6 @@
       "indexAnalyzer": null,
       "searchAnalyzer": null,
       "analyzer": null,
-      "synonymMaps": []
-    },
-    {
-      "name": "ProjectLinks",
-      "type": "Collection(Edm.String)",
-      "searchable": true,
-      "filterable": false,
-      "retrievable": true,
-      "sortable": false,
-      "facetable": false,
-      "key": false,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "analyzer": "standard.lucene",
       "synonymMaps": []
     },
     {
