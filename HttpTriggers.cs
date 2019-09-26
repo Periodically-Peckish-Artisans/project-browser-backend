@@ -13,6 +13,7 @@ using System.Web.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using Google.Apis.Auth.OAuth2;
+using System.Net.Http;
 
 namespace ProjectBrowser.Backend
 {
@@ -26,6 +27,59 @@ namespace ProjectBrowser.Backend
         public static IActionResult BuildVersionGet([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "build")] HttpRequest req)
         {
             return new JsonResult(new { BuildId = Environment.GetEnvironmentVariable("BuildId") });
+        }
+
+        [FunctionName("project-search")]
+        public static async Task<IActionResult> ProjectSearchAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "project")] HttpRequest req,
+            ILogger log)
+        {
+            Models.ProjectSearch search = null;
+            try {
+                search = JsonConvert.DeserializeObject<Models.ProjectSearch>(await new StreamReader(req.Body).ReadToEndAsync());
+            }
+            catch {
+                return new BadRequestResult();
+            }
+            
+            HttpClient client = new HttpClient();
+
+            string searchServiceName = Environment.GetEnvironmentVariable("AzureSearchServiceName");
+            string apiKey = Environment.GetEnvironmentVariable("AzureSearchServiceApiKey");
+
+            if (string.IsNullOrEmpty(searchServiceName) || string.IsNullOrEmpty(apiKey))
+            {
+                return new InternalServerErrorResult();
+            }
+
+            string responseBody = string.Empty;
+
+            try
+            {
+                string query = search.SearchString;
+                if (string.IsNullOrWhiteSpace(query)) {
+                    query = "*";
+                }
+
+                var url = $"https://{searchServiceName}.search.windows.net/indexes/project-search-index/docs?api-version=2019-05-06&search={Uri.EscapeDataString(query)}&api-key={apiKey}";
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                responseBody = await response.Content.ReadAsStringAsync();
+            }  
+            catch
+            {
+                return new BadRequestResult();
+            }
+
+            try
+            {
+                dynamic obj = JsonConvert.DeserializeObject(responseBody);
+                return new OkObjectResult(obj);
+            }
+            catch
+            {
+                return new InternalServerErrorResult();
+            }
         }
 
         [FunctionName("project-get")]

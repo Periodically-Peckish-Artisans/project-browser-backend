@@ -43,13 +43,6 @@ jobs:
       csmFile: 'azuredeploy.json'
       deploymentMode: 'Incremental'
       csmParametersFile: 'azuredeploy-parameters.json'
-  - task: AzureFunctionApp@1
-    displayName: Azure Function App Deploy
-    inputs:
-      azureSubscription: $(AzureServiceConnectionName)
-      appName: $(AppName)
-      package: '$(Build.SourcesDirectory)/package.zip'
-      resourceGroupName: '$(AzureResourceGroupName)'
   - task: AzureCLI@1
     displayName: Fetch Deployed Admin Keys (1)
     inputs:
@@ -64,6 +57,20 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: az storage account show-connection-string --resource-group $(AzureResourceGroupName) --name $(AzureStorageAccountName) > storagekeys.json
       workingDirectory: $(Build.SourcesDirectory)
+  - task: AzureCLI@1
+    displayName: Configure Search Apikey
+    inputs:
+      azureSubscription: '$(AzureServiceConnectionName)'
+      scriptLocation: inlineScript
+      inlineScript: py configure-search-apikey.py
+      workingDirectory: $(Build.SourcesDirectory)
+  - task: AzureFunctionApp@1
+    displayName: Azure Function App Deploy
+    inputs:
+      azureSubscription: $(AzureServiceConnectionName)
+      appName: $(AppName)
+      package: '$(Build.SourcesDirectory)/package.zip'
+      resourceGroupName: '$(AzureResourceGroupName)'
   - task: AzurePowerShell@4
     displayName: Create Storage Container
     inputs:

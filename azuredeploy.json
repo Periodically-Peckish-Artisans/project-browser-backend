@@ -127,6 +127,10 @@
             {
               "name": "BuildId",
               "value": "[variables('build')]"
+            },
+            {
+              "name": "AzureSearchServiceName",
+              "value": "[variables('searchServiceName')]"
             }
           ]
         }
