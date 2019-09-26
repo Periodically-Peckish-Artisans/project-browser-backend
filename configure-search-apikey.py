@@ -16,7 +16,7 @@ print('Finding Keys.')
 
 keys = json.loads(executeCmd('az search query-key list --resource-group %s --service-name %s' % (rg, an)))
 
-matchingKeys = [x["key"] for i, x in enumerate(keys) if x["name"] == "test"]
+matchingKeys = [x["key"] for i, x in enumerate(keys) if x["name"] == "backendservice"]
 
 print('Found %d key(s) matching our backend service. Deleting.' % (len(matchingKeys)))
 
@@ -24,7 +24,7 @@ for key in matchingKeys:
   executeCmd('az search query-key delete --key-value %s --resource-group %s --service-name %s' % (key, rg, an))
 
 print('Creating new key.')
-newKey = json.loads(executeCmd('az search query-key create --name test --resource-group %s --service-name %s' % (rg, an)))
+newKey = json.loads(executeCmd('az search query-key create --name backendservice --resource-group %s --service-name %s' % (rg, an)))
 
 print('Setting app setting.')
 print(executeCmd('az functionapp config appsettings set --name %s --resource-group %s --settings "AzureSearchServiceApiKey=%s"' % (an, rg, newKey["key"])))

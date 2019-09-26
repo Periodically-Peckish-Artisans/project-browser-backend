@@ -61,7 +61,7 @@ namespace ProjectBrowser.Backend
                     query = "*";
                 }
 
-                var url = $"https://{searchServiceName}.search.windows.net/indexes/project-search-index/docs?api-version=2019-05-06&search={Uri.EscapeDataString(query)}&api-key={apiKey}";
+                var url = $"https://{searchServiceName}.search.windows.net/indexes/project-search-index/docs?api-version=2019-05-06&search={Uri.EscapeUriString(query)}&api-key={apiKey}";
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 responseBody = await response.Content.ReadAsStringAsync();
