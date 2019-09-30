@@ -32,4 +32,4 @@ print('Finding admin keys.')
 adminKeys = json.loads(executeCmd('az search admin-key show --resource-group %s --service-name %s' % (rg, an)))
 
 print('Setting app settings.')
-print(executeCmd('az functionapp config appsettings set --name %s --resource-group %s --settings "AzureSearchServiceAdminApiKey=%s AzureSearchServiceQueryApiKey=%s"' % (an, rg, adminKeys["primaryKey"], newQueryKey["key"])))
+print(executeCmd('az functionapp config appsettings set --name %s --resource-group %s --settings "AzureSearchServiceAdminApiKey=%s" "AzureSearchServiceQueryApiKey=%s"' % (an, rg, adminKeys["primaryKey"], newQueryKey["key"])))
