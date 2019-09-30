@@ -45,7 +45,7 @@ namespace ProjectBrowser.Backend
             HttpClient client = new HttpClient();
 
             string searchServiceName = Environment.GetEnvironmentVariable("AzureSearchServiceName");
-            string apiKey = Environment.GetEnvironmentVariable("AzureSearchServiceApiKey");
+            string apiKey = Environment.GetEnvironmentVariable("AzureSearchServiceQueryApiKey");
 
             if (string.IsNullOrEmpty(searchServiceName) || string.IsNullOrEmpty(apiKey))
             {
@@ -66,8 +66,9 @@ namespace ProjectBrowser.Backend
                 response.EnsureSuccessStatusCode();
                 responseBody = await response.Content.ReadAsStringAsync();
             }  
-            catch
+            catch (Exception ex)
             {
+                log.LogError(ex, "Failed to execute proejct search.");
                 return new BadRequestResult();
             }
 
@@ -141,6 +142,30 @@ namespace ProjectBrowser.Backend
             return uid;
         }
 
+        private static async void RunSearchIndexerAsync() {
+            HttpClient client = new HttpClient();
+
+            string searchServiceName = Environment.GetEnvironmentVariable("AzureSearchServiceName");
+            string apiKey = Environment.GetEnvironmentVariable("AzureSearchServiceAdminApiKey");
+
+            if (string.IsNullOrEmpty(searchServiceName) || string.IsNullOrEmpty(apiKey))
+            {
+                return;
+            }
+
+            try
+            {
+                client.DefaultRequestHeaders.Add("api-key", apiKey);
+                var url = $"https://{searchServiceName}.search.windows.net/indexers/projectindexer/run?api-version=2019-05-06";
+                HttpResponseMessage response = await client.PostAsync(url, null);
+                response.EnsureSuccessStatusCode();
+            }  
+            catch
+            {
+                return;
+            }
+        }
+
         [FunctionName("project-put")]
         public static async Task<IActionResult> ProjectPutAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "project/{projectId}")] HttpRequest req,
@@ -204,6 +229,9 @@ namespace ProjectBrowser.Backend
                 }
 
                 await project.UploadTextAsync(JsonConvert.SerializeObject(inProjectObj));
+
+                RunSearchIndexerAsync();
+
                 return new OkResult();
             }
             else { // New Project
@@ -231,6 +259,9 @@ namespace ProjectBrowser.Backend
                 }
 
                 await project.UploadTextAsync(JsonConvert.SerializeObject(inProjectObj));
+
+                RunSearchIndexerAsync();
+
                 return new OkResult();
             }
         }

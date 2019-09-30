@@ -12,7 +12,7 @@ print('Fetching Environment.')
 an = os.environ['APPNAME']
 rg = os.environ['AZURERESOURCEGROUPNAME']
 
-print('Finding Keys.')
+print('Finding Query Keys.')
 
 keys = json.loads(executeCmd('az search query-key list --resource-group %s --service-name %s' % (rg, an)))
 
@@ -24,7 +24,12 @@ for key in matchingKeys:
   executeCmd('az search query-key delete --key-value %s --resource-group %s --service-name %s' % (key, rg, an))
 
 print('Creating new key.')
-newKey = json.loads(executeCmd('az search query-key create --name backendservice --resource-group %s --service-name %s' % (rg, an)))
+newQueryKey = json.loads(executeCmd('az search query-key create --name backendservice --resource-group %s --service-name %s' % (rg, an)))
 
-print('Setting app setting.')
-print(executeCmd('az functionapp config appsettings set --name %s --resource-group %s --settings "AzureSearchServiceApiKey=%s"' % (an, rg, newKey["key"])))
+
+print('Finding admin keys.')
+
+adminKeys = json.loads(executeCmd('az search admin-key show --resource-group %s --service-name %s' % (rg, an)))
+
+print('Setting app settings.')
+print(executeCmd('az functionapp config appsettings set --name %s --resource-group %s --settings "AzureSearchServiceAdminApiKey=%s AzureSearchServiceQueryApiKey=%s"' % (an, rg, adminKeys["primaryKey"], newQueryKey["key"])))
