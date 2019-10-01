@@ -91,7 +91,7 @@ namespace ProjectBrowser.Backend
 
         [FunctionName("event-search")]
         public static async Task<IActionResult> EventSearchAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "project")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event")] HttpRequest req,
             ILogger log)
         {
             return await SearchAsync(req, log, "event-search-index");
