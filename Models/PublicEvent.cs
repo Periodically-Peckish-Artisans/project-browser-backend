@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace ProjectBrowser.Backend.Models {
 
     /// <summary>
@@ -25,20 +31,62 @@ namespace ProjectBrowser.Backend.Models {
         OncePerMonth
     }
 
-    public class PublicEvent {
+    public class PublicEvent : IDoc {
         public string EventTitle { get; set; }
         public string Id { get; set; }
-        public string EventDescription { get; set; }
+        public string Description { get; set; }
         public bool IsArchived { get; set; } = false;
         public string EventLocation { get; set; }
         public string StartDateTime { get; set; }
+        public string ProjectId { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public EventRecurrenceMode RecurrenceMode { get; set; } = EventRecurrenceMode.Once;
 
         /// <summary>
         /// This will send a message to an advertising committee to consider
         /// Advertising the event on Facebook / Meetup, etc.
         /// </summary>
-        public bool AdvertiseEvent { get; set; }
+        public bool AdvertiseEvent { get; set; } = false;
+
+        public List<string> ManagerIds { get; set; } = new List<string>();
+
+        public bool Equivalent(object obj)
+        {
+            if (obj == null) {
+                return false;
+            }
+
+            if (obj == this) {
+                return true;
+            }
+
+            PublicEvent o = obj as PublicEvent;
+            if (o == null) {
+                return false;
+            }
+
+            return o.EventTitle == EventTitle &&
+                o.Id == Id &&
+                o.Description == Description &&
+                o.IsArchived == IsArchived &&
+                o.EventLocation == EventLocation &&
+                o.StartDateTime == StartDateTime &&
+                o.ProjectId == ProjectId &&
+                (ManagerIds == o.ManagerIds || (o.ManagerIds?.SequenceEqual(ManagerIds) ?? false));
+        }
+
+        public bool Validate()
+        {
+            return !string.IsNullOrWhiteSpace(EventTitle) &&
+                !string.IsNullOrWhiteSpace(Id) &&
+                Guid.TryParse(Id, out Guid guidResult) &&
+                Description != null &&
+                EventLocation != null &&
+                StartDateTime != null &&
+                DateTime.TryParse(StartDateTime, out DateTime dateResult) &&
+                ManagerIds != null &&
+                ManagerIds.Count > 0;
+        }
     }
 }

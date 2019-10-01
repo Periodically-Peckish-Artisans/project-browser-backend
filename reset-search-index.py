@@ -30,24 +30,36 @@ storageconnstr = ''
 with open('storagekeys.json') as fp:
   storageconnstr = json.load(fp)['connectionString']
 
-executeSearchFunc('DELETE', '/datasources/projectdatasource', {})
-executeSearchFunc('POST', '/datasources', {
-    'name' : 'projectdatasource',
-    'type' : 'azureblob',
-    'credentials' : { 'connectionString' : storageconnstr },  
-    'container' : { 'name' : 'project' },  
-})
+def resetDataSource(dataSourceName, container):
+  executeSearchFunc('DELETE', '/datasources/%s' % (dataSourceName), {})
+  executeSearchFunc('POST', '/datasources', {
+      'name' : dataSourceName,
+      'type' : 'azureblob',
+      'credentials' : { 'connectionString' : storageconnstr },  
+      'container' : { 'name' : container },  
+  })
 
-projectSearchIndex = {}
-with open('project-search-index.json') as fp:
-  projectSearchIndex = json.load(fp)
-projName = projectSearchIndex['name']
-executeSearchFunc('DELETE', '/indexes/%s' % (projName), {})
-executeSearchFunc('POST', '/indexes', projectSearchIndex)
+resetDataSource('projectdatasource', 'project')
+resetDataSource('eventdatasource', 'event')
 
-projectSeearchIndexer = {}
-with open('project-search-indexer.json') as fp:
-  projectSeearchIndexer = json.load(fp)
-projIndexerName = projectSeearchIndexer['name']
-executeSearchFunc('DELETE', '/indexers/%s' % (projIndexerName), {})
-executeSearchFunc('POST', '/indexers', projectSeearchIndexer)
+def resetIndex(indexFileName):
+  indexConfig = {}
+  with open('%s.json' % (indexFileName)) as fp:
+    indexConfig = json.load(fp)
+  indexName = indexConfig['name']
+  executeSearchFunc('DELETE', '/indexes/%s' % (indexName), {})
+  executeSearchFunc('POST', '/indexes', indexConfig)
+
+def resetIndexer(indexerFileName):
+  indexerConfig = {}
+  with open('%s.json' % (indexerFileName)) as fp:
+    indexerConfig = json.load(fp)
+  indexerName = indexerConfig['name']
+  executeSearchFunc('DELETE', '/indexers/%s' % (indexerName), {})
+  executeSearchFunc('POST', '/indexers', indexerConfig)
+
+resetIndex('project-search-index')
+resetIndexer('project-search-indexer')
+
+resetIndex('event-search-index')
+resetIndexer('event-search-indexer')

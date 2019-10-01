@@ -1,5 +1,5 @@
 namespace ProjectBrowser.Backend.Models {
-    public class ProjectSearch {
+    public class Search {
         public string SearchString { get; set; }
     }
 }
