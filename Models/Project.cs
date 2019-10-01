@@ -12,6 +12,10 @@ namespace ProjectBrowser.Backend.Models {
         public string ProjectWebsite { get; set; } = string.Empty;
         public string ProjectLocation { get; set; } = string.Empty;
         public bool IsArchived { get; set; } = false;
+        public int Version { get; set; } = Ver.Current;
+        public string DocCreationDate { get; set; } = DateTime.UtcNow.ToString();
+
+        public string GetDocType() => "project";
 
         public bool Validate() {
             return !string.IsNullOrWhiteSpace(ProjectName) &&
@@ -22,7 +26,10 @@ namespace ProjectBrowser.Backend.Models {
                 DateTime.TryParse(ExpirationDate, out DateTime dateResult) &&
                 ManagerIds != null &&
                 ManagerIds.Count > 0 &&
-                ProjectWebsite != null;
+                ProjectWebsite != null &&
+                DocCreationDate != null &&
+                DateTime.TryParse(DocCreationDate, out DateTime dateResult2) &&
+                Version == Ver.Current;
         }
 
         public bool Equivalent(object obj) {
@@ -46,7 +53,9 @@ namespace ProjectBrowser.Backend.Models {
                 (ManagerIds == o.ManagerIds || (o.ManagerIds?.SequenceEqual(ManagerIds) ?? false)) &&
                 o.ProjectWebsite == ProjectWebsite &&
                 o.ProjectLocation == ProjectLocation &&
-                o.IsArchived == IsArchived;
+                o.IsArchived == IsArchived &&
+                o.Version == Version &&
+                o.DocCreationDate == DocCreationDate;
         }
   }
 }

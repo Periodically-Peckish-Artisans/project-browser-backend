@@ -81,6 +81,7 @@ jobs:
         $acc = Get-AzStorageAccount -ResourceGroupName "$(AzureResourceGroupName)" -Name "$(AzureStorageAccountName)"
         New-AzStorageContainer -Name "project" -Context $acc.Context
         New-AzStorageContainer -Name "event" -Context $acc.Context
+        New-AzStorageContainer -Name "profile" -Context $acc.Context
       failOnStandardError: false
       azurePowerShellVersion: latestVersion
   - task: Powershell@2

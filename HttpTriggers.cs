@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Web.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
@@ -135,6 +136,15 @@ namespace ProjectBrowser.Backend
             return await DocumentGetAsync<Models.PublicEvent>(req, log, eventBlob);
         }
 
+        [FunctionName("profile-get")]
+        public static async Task<IActionResult> ProfileGetAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "profile/{uid}")] HttpRequest req,
+            ILogger log,
+            [Blob("profile/{uid}", FileAccess.Read)] CloudBlockBlob profile)
+        {
+            return await DocumentGetAsync<Models.Profile>(req, log, profile);
+        }
+
         private static async Task<string> GetUidAsync(HttpRequest req, ExecutionContext context, ILogger log) {
             string token = req.Headers["Authorization"];
             if (string.IsNullOrEmpty(token)) {
@@ -193,18 +203,53 @@ namespace ProjectBrowser.Backend
             }
         }
 
-        private async static Task<IActionResult> DocumentPutAsync<T>(HttpRequest req, ILogger log, CloudBlockBlob doc, string docId, ExecutionContext context) where T : Models.IDoc
+        private async static Task<IActionResult> AddDocOwnershipToProfileAsync(string uid, Models.IDoc doc, CloudBlobContainer container, ILogger log, ExecutionContext context)
         {
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var profileBlob = container.GetBlockBlobReference(uid);
 
-            T inDocObj;
-            try {
-                inDocObj = JsonConvert.DeserializeObject<T>(requestBody);
+            Models.Profile profile = null;
+            if (await profileBlob.ExistsAsync())
+            {
+                try {
+                    profile = JsonConvert.DeserializeObject<Models.Profile>(await profileBlob.DownloadTextAsync());
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Failed to fetch profile.");
+                    return new InternalServerErrorResult();
+                }
             }
-            catch {
-                return new BadRequestResult();
+            else
+            {
+                profile = new Models.Profile
+                {
+                    Id = uid,
+                    ManagerIds = new List<string> { uid },
+                };
+
+                profile.OwnedDocs.Add(new Models.DocumentRef { DocType = profile.GetDocType(), DocId = uid });
+
+                if (!profile.Validate())
+                {
+                    return new BadRequestResult();
+                }
             }
 
+            if (profile.OwnedDocs == null) {
+                return new InternalServerErrorResult();
+            }
+
+            if (profile.OwnedDocs.Any(d => d.DocId == doc.Id && d.DocType == doc.GetDocType())) {
+                return new OkResult();
+            }
+
+            profile.OwnedDocs.Add(new Models.DocumentRef { DocType = doc.GetDocType(), DocId = doc.Id });
+
+            return await DocumentObjectPutAsync(profile, log, profileBlob, uid, context, uid, container);
+        }
+
+        private async static Task<IActionResult> DocumentObjectPutAsync<T>(T inDocObj, ILogger log, CloudBlockBlob doc, string docId, ExecutionContext context, string uid, CloudBlobContainer profileContainer) where T : Models.IDoc
+        {
             if (string.IsNullOrEmpty(inDocObj.Id)) {
                 inDocObj.Id = docId;
             }
@@ -223,11 +268,7 @@ namespace ProjectBrowser.Backend
                     return new InternalServerErrorResult();
                 }
 
-                string uid = string.Empty;
-
                 if (GetUseAuth()) {
-                    uid = await GetUidAsync(req, context, log);
-
                     if (uid == null) {
                         return new UnauthorizedResult();
                     }
@@ -259,7 +300,6 @@ namespace ProjectBrowser.Backend
                 }
 
                 if (GetUseAuth()) {
-                    string uid = await GetUidAsync(req, context, log);
                     if (uid == null) {
                         return new UnauthorizedResult();
                     }
@@ -277,10 +317,44 @@ namespace ProjectBrowser.Backend
                     return new BadRequestResult();
                 }
 
-                await doc.UploadTextAsync(JsonConvert.SerializeObject(inDocObj));
+                if (GetUseAuth()) {
+                    var result = await AddDocOwnershipToProfileAsync(uid, inDocObj, profileContainer, log, context);
+                    if (!(result is OkResult))
+                    {
+                        return result;
+                    }
+                }
 
-                return new OkResult();
+                try {
+                    await doc.UploadTextAsync(JsonConvert.SerializeObject(inDocObj));
+                    return new OkResult();
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Failed to upload doc blob.");
+                    return new InternalServerErrorResult();
+                }
             }
+        }
+
+        private async static Task<IActionResult> DocumentRequestPutAsync<T>(HttpRequest req, ILogger log, CloudBlockBlob doc, string docId, ExecutionContext context, CloudBlobContainer profileContainer) where T : Models.IDoc
+        {
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+            T inDocObj;
+            try {
+                inDocObj = JsonConvert.DeserializeObject<T>(requestBody);
+            }
+            catch {
+                return new BadRequestResult();
+            }
+
+            string uid = string.Empty;
+            if (GetUseAuth()) {
+                uid = await GetUidAsync(req, context, log);
+            }
+
+            return await DocumentObjectPutAsync(inDocObj, log, doc, docId, context, uid, profileContainer);
         }
 
         [FunctionName("project-put")]
@@ -288,10 +362,11 @@ namespace ProjectBrowser.Backend
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "project/{projectId}")] HttpRequest req,
             ILogger log,
             [Blob("project/{projectId}", FileAccess.ReadWrite)] CloudBlockBlob project,
+            [Blob("profile", FileAccess.Read)] CloudBlobContainer profileContainer,
             string projectId,
             ExecutionContext context)
         {
-            var result = await DocumentPutAsync<Models.Project>(req, log, project, projectId, context);
+            var result = await DocumentRequestPutAsync<Models.Project>(req, log, project, projectId, context, profileContainer);
             if (result is OkResult) {
                 RunSearchIndexerAsync("projectindexer");
             }
@@ -303,14 +378,27 @@ namespace ProjectBrowser.Backend
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "event/{eventId}")] HttpRequest req,
             ILogger log,
             [Blob("event/{eventId}", FileAccess.ReadWrite)] CloudBlockBlob eventBlob,
+            [Blob("profile", FileAccess.Read)] CloudBlobContainer profileContainer,
             string eventId,
             ExecutionContext context)
         {
-            var result = await DocumentPutAsync<Models.PublicEvent>(req, log, eventBlob, eventId, context);
+            var result = await DocumentRequestPutAsync<Models.PublicEvent>(req, log, eventBlob, eventId, context, profileContainer);
             if (result is OkResult) {
                 RunSearchIndexerAsync("eventindexer");
             }
             return result;
+        }
+
+        [FunctionName("profile-put")]
+        public static async Task<IActionResult> ProfilePutAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "profile/{uid}")] HttpRequest req,
+            ILogger log,
+            [Blob("profile/{uid}", FileAccess.ReadWrite)] CloudBlockBlob profile,
+            [Blob("profile", FileAccess.Read)] CloudBlobContainer profileContainer,
+            string uid,
+            ExecutionContext context)
+        {
+            return await DocumentRequestPutAsync<Models.Profile>(req, log, profile, uid, context, profileContainer);
         }
     }
 }

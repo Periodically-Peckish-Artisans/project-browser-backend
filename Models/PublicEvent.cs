@@ -39,6 +39,8 @@ namespace ProjectBrowser.Backend.Models {
         public string EventLocation { get; set; }
         public string StartDateTime { get; set; }
         public string ProjectId { get; set; }
+        public int Version { get; set; } = Ver.Current;
+        public string DocCreationDate { get; set; } = DateTime.UtcNow.ToString();
 
         [JsonConverter(typeof(StringEnumConverter))]
         public EventRecurrenceMode RecurrenceMode { get; set; } = EventRecurrenceMode.Once;
@@ -50,6 +52,8 @@ namespace ProjectBrowser.Backend.Models {
         public bool AdvertiseEvent { get; set; } = false;
 
         public List<string> ManagerIds { get; set; } = new List<string>();
+
+        public string GetDocType() => "event";
 
         public bool Equivalent(object obj)
         {
@@ -73,7 +77,9 @@ namespace ProjectBrowser.Backend.Models {
                 o.EventLocation == EventLocation &&
                 o.StartDateTime == StartDateTime &&
                 o.ProjectId == ProjectId &&
-                (ManagerIds == o.ManagerIds || (o.ManagerIds?.SequenceEqual(ManagerIds) ?? false));
+                (ManagerIds == o.ManagerIds || (o.ManagerIds?.SequenceEqual(ManagerIds) ?? false)) &&
+                o.Version == Version &&
+                o.DocCreationDate == DocCreationDate;
         }
 
         public bool Validate()
@@ -86,7 +92,10 @@ namespace ProjectBrowser.Backend.Models {
                 StartDateTime != null &&
                 DateTime.TryParse(StartDateTime, out DateTime dateResult) &&
                 ManagerIds != null &&
-                ManagerIds.Count > 0;
+                ManagerIds.Count > 0 &&
+                DocCreationDate != null &&
+                DateTime.TryParse(DocCreationDate, out DateTime dateResult2) &&
+                Version == Ver.Current;
         }
     }
 }
